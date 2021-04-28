@@ -3,10 +3,15 @@ extends Node
 
 onready var thread: Thread = Thread.new()
 onready var _mutex: Mutex = Mutex.new()
-
 var _is_running: bool = false
 
-signal command_finished(path, arguments, output, exit_code, identifier)
+export var path: String = ""
+export var arguments: PoolStringArray = []
+export var error_checking: bool = true
+export var expected_exit_code: int = 0
+
+signal command_successful(arguments, output, exit_code)
+signal command_failed(arguments, output, exit_code)
 
 func _set_is_running(running: bool):
 	_mutex.lock()
@@ -19,23 +24,27 @@ func get_is_running() -> bool:
 	_mutex.unlock()
 	return res
 
-func execute(path: String, arguments: PoolStringArray, identifier = null):
+func execute(additional_arguments: PoolStringArray = []):
 	while get_is_running():
 		yield(Engine.get_main_loop(), "idle_frame")
 	_cleanup()
-	_execute_shell_command(path, arguments, identifier)
+	_execute_shell_command(additional_arguments)
 
-func _execute_shell_command(path: String, arguments: PoolStringArray, identifier):
+func _execute_shell_command(additional_arguments: PoolStringArray):
 	_set_is_running(true)
-	thread.start(self, "_thread_runner", [path, arguments, identifier])
+	var concat_arguments = arguments
+	concat_arguments.append_array(additional_arguments)
+	thread.start(self, "_thread_runner", [path, concat_arguments])
 
 func _thread_runner(parameters):
 	var path: String = parameters[0]
 	var args: PoolStringArray = parameters[1]
-	var identifier = parameters[2]
 	var output: Array = []
 	var exit_code := OS.execute(path, args, true, output, true)
-	emit_signal("command_finished", path, args, output[0], exit_code, identifier)
+	if error_checking and expected_exit_code != exit_code:
+		emit_signal("command_failed", args, output[0], exit_code)
+	else:
+		emit_signal("command_successful", args, output[0], exit_code)
 	_set_is_running(false)
 
 func _cleanup():

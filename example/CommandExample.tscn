@@ -1,0 +1,50 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://example/CommandExample.gd" type="Script" id=1]
+[ext_resource path="res://addons/os_async_executer/OSCommand.gd" type="Script" id=2]
+
+[node name="CommandExample" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Ping" type="Node" parent="."]
+script = ExtResource( 2 )
+path = "ping"
+arguments = PoolStringArray( "-n", "1" )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+margin_left = 268.0
+margin_top = 357.0
+margin_right = 819.0
+margin_bottom = 515.0
+scroll_following = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button" type="Button" parent="."]
+margin_left = 256.0
+margin_top = 159.0
+margin_right = 582.0
+margin_bottom = 242.0
+text = "Ping"
+
+[node name="Label" type="Label" parent="."]
+margin_left = 181.0
+margin_top = 45.0
+margin_right = 652.0
+margin_bottom = 96.0
+text = "Example to demonstrate how to use the OS command. The purpose is to move as much information as possible from the source code to the node tree."
+align = 1
+valign = 1
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="command_failed" from="Ping" to="." method="_on_Ping_command_failed"]
+[connection signal="command_successful" from="Ping" to="." method="_on_Ping_command_successful"]
+[connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]

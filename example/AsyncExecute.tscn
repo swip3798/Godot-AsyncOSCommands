@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://example/AsyncExecute.gd" type="Script" id=1]
+[ext_resource path="res://addons/os_async_executer/OSAsyncExecute.gd" type="Script" id=2]
+
+[node name="AsyncExecute" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="OSAsyncExecute" type="Node" parent="."]
+script = ExtResource( 2 )
+
+[node name="Button" type="Button" parent="."]
+margin_left = 251.0
+margin_top = 173.0
+margin_right = 521.0
+margin_bottom = 230.0
+text = "Run ping async"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+margin_left = 108.0
+margin_top = 316.0
+margin_right = 815.0
+margin_bottom = 504.0
+scroll_following = true
+
+[node name="Label" type="Label" parent="."]
+margin_right = 435.0
+margin_bottom = 14.0
+[connection signal="command_finished" from="OSAsyncExecute" to="." method="_on_OSAsyncExecute_command_finished"]
+[connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]
